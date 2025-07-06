@@ -17,31 +17,14 @@ import numpy as np
 from pypeit.core import basis
 from pypeit import datamodel
 
-try:
-    from pypeit.bspline.utilc import (
-        cholesky_band,
-        cholesky_solve,
-        solution_arrays,
-        intrv,
-        bspline_model,
-    )
-except Exception as _:
-    warnings.warn(
-        "Unable to load bspline C extension.  Try rebuilding pypeit.  In the "
-        "meantime, falling back to pure python code."
-    )
-    from pypeit.bspline.utilpy import (
-        cholesky_band,
-        cholesky_solve,
-        solution_arrays,
-        intrv,
-        bspline_model,
-    )
 
-# TODO: Used for testing.  Keep around for now.
-# from pypeit.bspline.utilpy import bspline_model
-# from pypeit.bspline.utilpy import cholesky_band, cholesky_solve, solution_arrays, intrv, \
-#                                    bspline_model
+from pypeit.bspline.utilpy import (
+    cholesky_band,
+    cholesky_solve,
+    solution_arrays,
+    intrv,
+    bspline_model,
+)
 
 # TODO: Types are important for the C extension. Types should be
 # limited to int, float, bool!
@@ -51,7 +34,8 @@ except Exception as _:
 
 
 class bspline(datamodel.DataContainer):
-    """Bspline class.
+    """
+    Bspline class.
 
     Functions in the bspline library are implemented as methods on this
     class.
@@ -136,7 +120,8 @@ class bspline(datamodel.DataContainer):
         from_dict=None,
         **kwargs,
     ):
-        """Init creates an object whose attributes are similar to the
+        """
+        Init creates an object whose attributes are similar to the
         structure returned by the create_bspline function.
         """
         # Setup the DataContainer with everything None
@@ -355,7 +340,8 @@ class bspline(datamodel.DataContainer):
     # TODO: Should this be used, or should we effectively replace it
     # with the content of utils.bspline_profile
     def fit(self, xdata, ydata, invvar, x2=None):
-        """Calculate a B-spline in the least-squares sense.
+        """
+        Calculate a B-spline in the least-squares sense.
 
         Fit is based on two variables: x which is sorted and spans a large range
         where bkpts are required y which can be described with a low order
@@ -443,7 +429,8 @@ class bspline(datamodel.DataContainer):
         return (0, yfit)
 
     def action(self, x, x2=None):
-        """Construct banded bspline matrix, with dimensions [ndata, bandwidth].
+        """
+        Construct banded bspline matrix, with dimensions [ndata, bandwidth].
 
         Parameters
         ----------
@@ -522,7 +509,8 @@ class bspline(datamodel.DataContainer):
 
     # TODO: C this?
     def bsplvn(self, x, ileft):
-        """To be documented.
+        """
+        To be documented.
 
         Parameters
         ----------
@@ -561,7 +549,8 @@ class bspline(datamodel.DataContainer):
         return vnikx
 
     def value(self, x, x2=None, action=None, lower=None, upper=None):
-        """Evaluate a bspline at specified values.
+        """
+        Evaluate a bspline at specified values.
 
         Parameters
         ----------
@@ -619,7 +608,8 @@ class bspline(datamodel.DataContainer):
         return yfit[np.argsort(xsort, kind="stable")], mask
 
     def maskpoints(self, err):
-        """Perform simple logic of which breakpoints to mask.
+        """
+        Perform simple logic of which breakpoints to mask.
 
 
         Parameters
