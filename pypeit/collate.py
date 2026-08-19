@@ -70,6 +70,10 @@ class SourceObject:
         self.spec1d_header_list = [spec1d_header]
         self._spectrograph = spectrograph
         self.match_type = match_type
+        # Output coadd file name, assigned once by collate_1d so the coadd and
+        # the archive report agree on a single value (see build_coadd_file_name
+        # and get_report_metadata).  None until collate_1d sets it.
+        self.coaddfile = None
 
         if (match_type == 'ra/dec'):
             try:
@@ -269,7 +273,11 @@ def get_report_metadata(object_header_keys, spec_obj_keys, file_info):
     if not isinstance(file_info, SourceObject):
         return (None, None)
 
-    coaddfile = build_coadd_file_name(file_info)
+    # Prefer the name assigned by collate_1d so the report matches the file that
+    # was actually written; fall back to computing it for sources that never
+    # went through the coadd loop.
+    coaddfile = file_info.coaddfile if getattr(file_info, 'coaddfile', None) \
+        is not None else build_coadd_file_name(file_info)
     result_rows = []
     for i in range(len(file_info.spec1d_header_list)):
 
@@ -799,7 +807,11 @@ def collate_1d(par, spectrograph, tolerance, spec1d_files):
     failed_source_log = []
     for source in source_list:
 
-        coaddfile = os.path.join(par['collate1d']['outdir'], build_coadd_file_name(source))
+        # Assign the output name once and record it on the source so the
+        # archive report (get_report_metadata) uses the same value instead of
+        # recomputing it.
+        source.coaddfile = build_coadd_file_name(source)
+        coaddfile = os.path.join(par['collate1d']['outdir'], source.coaddfile)
         log.info(f'Creating {coaddfile} from the following sources:')
         for i in range(len(source.spec_obj_list)):
             log.info(f'    {source.spec1d_file_list[i]}: {source.spec_obj_list[i].NAME} '

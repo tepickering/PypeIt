@@ -503,6 +503,15 @@ def test_get_report_metadata(monkeypatch):
                                                 ['MASKDEF_OBJNAME', 'NAME'],
                                                 "afilename")
 
+    # When collate_1d has assigned a coaddfile on the source, the report uses
+    # that exact name rather than recomputing it (so a disambiguated output
+    # name stays consistent between the written file and the archive report).
+    source_object.coaddfile = 'assigned_name_DEIMOS_20200130_20200131.fits'
+    (assigned_rows, _) = get_report_metadata(['DISPNAME', 'MJD', 'GUIDFHWM'],
+                                             ['MASKDEF_OBJNAME', 'NAME'],
+                                             source_object)
+    assert all(row[0] == source_object.coaddfile for row in assigned_rows)
+
 @pytest.mark.remote_data
 def test_flux(monkeypatch):
     
